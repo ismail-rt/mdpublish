@@ -1,0 +1,5 @@
+{
+    "content": "reference/sample-posts",
+    "output": "blog.generated.ts",
+    "format": "ts"
+  }

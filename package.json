@@ -1,5 +1,5 @@
 {
-  "name": "mdpublish",
+  "name": "@ismail-rt/mdpublish",
   "version": "0.1.0",
   "description": "CLI and library for validating markdown frontmatter and generating a typed blog manifest",
   "keywords": [
@@ -17,7 +17,7 @@
   "author": "Muhammad Ismail <ismail@atlasflowai.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ismail-rt/mdpublish.git"
+    "url": "git+https://github.com/ismail-rt/mdpublish.git"
   },
   "homepage": "https://github.com/ismail-rt/mdpublish#readme",
   "bugs": {
