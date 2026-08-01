@@ -34,6 +34,7 @@ export interface ConfigOverrides {
   categories?: string[];
   featured?: string;
   strict?: boolean;
+  includeDrafts?: boolean;
   configPath?: string;
 }
 
@@ -75,6 +76,7 @@ export function loadConfig(overrides: ConfigOverrides = {}): ResolvedConfig {
   if (overrides.categories !== undefined) merged["categories"] = overrides.categories;
   if (overrides.featured !== undefined) merged["featured"] = overrides.featured;
   if (overrides.strict !== undefined) merged["strict"] = overrides.strict;
+  if (overrides.includeDrafts !== undefined) merged["includeDrafts"] = overrides.includeDrafts;
 
   const result = ConfigSchema.safeParse(merged);
   if (!result.success) {

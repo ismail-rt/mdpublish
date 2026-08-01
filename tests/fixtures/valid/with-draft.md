@@ -15,4 +15,4 @@ draft: true
 
 # Getting Started
 
-This post is marked as a draft and should appear in the output with draft: true.
+This post is marked as a draft and appears in output only when drafts are included.

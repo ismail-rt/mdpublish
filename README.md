@@ -5,7 +5,7 @@ A lightweight CLI and Node.js library for validating markdown frontmatter and ge
 **Write blog posts as `.md` files. Run one command. Get a clean output file your app can import directly.**
 
 ```bash
-npx mdpublish sync
+npx @ismail-rt/mdpublish sync
 ```
 
 ---
@@ -26,22 +26,33 @@ Most static blog setups end up with a hand-rolled script that parses frontmatter
 ## Install
 
 ```bash
-npm install --save-dev mdpublish
+npm install --save-dev @ismail-rt/mdpublish
 # or
-npm install -g mdpublish
+npm install -g @ismail-rt/mdpublish
 ```
 
 ---
 
 ## Quickstart
 
+For a ready-to-edit config and sample post, run:
+
+```bash
+npx @ismail-rt/mdpublish init
+```
+
+The command will not overwrite an existing config or sample post.
+
 **1. Create a content folder with markdown posts:**
 
 ```
 content/
   hello-world.md
-  getting-started.md
+  guides/
+    getting-started.md
 ```
+
+Content folders are scanned recursively.
 
 **2. Add frontmatter to each post:**
 
@@ -67,7 +78,7 @@ Your post body here...
 **3. Run sync:**
 
 ```bash
-npx mdpublish sync
+npx @ismail-rt/mdpublish sync
 ```
 
 **4. Import the generated file in your app:**
@@ -79,6 +90,15 @@ import { blogPosts, featuredPost, allCategories, allTags } from "./blog.generate
 ---
 
 ## CLI Commands
+
+### `mdpublish init`
+
+Creates `mdpublish.config.json` and `content/hello-world.md`. It exits without
+changing either file if one already exists.
+
+```bash
+mdpublish init
+```
 
 ### `mdpublish sync`
 
@@ -92,12 +112,14 @@ Options:
   --output <path>     Output file path                 [default: "blog.generated.ts"]
   --format <ts|json>  Output format: ts or json        [default: "ts"]
   --featured <slug>   Pin a post slug as the featured post
+  --include-drafts    Include draft posts in generated output
   --dry-run           Print output to stdout, do not write file
   --config <path>     Path to config file              [default: "./mdpublish.config.json"]
 ```
 
 **Behavior:**
 - If any validation errors are found, they are all printed and no file is written (exit 1)
+- All posts are validated, but drafts are excluded from output unless `--include-drafts` is set
 - Posts are sorted: non-zero `order` values ascending first, then by `date` descending
 - The output file is self-contained — it includes the `BlogPost` interface definition
 
@@ -116,6 +138,15 @@ Options:
 
 **Exit codes:** `0` = all valid, `1` = one or more errors (or warnings in `--strict` mode)
 
+### `mdpublish list`
+
+Lists the title, slug, date, category, draft status, and featured status of every
+post. It validates content but never writes an output file.
+
+```bash
+mdpublish list [--content <path>] [--config <path>]
+```
+
 ---
 
 ## Config File
@@ -133,7 +164,8 @@ Create `mdpublish.config.json` at your project root:
     "Product"
   ],
   "featured": "hello-world",
-  "strict": false
+  "strict": false,
+  "includeDrafts": false
 }
 ```
 
@@ -145,6 +177,7 @@ Create `mdpublish.config.json` at your project root:
 | `categories` | `string[]` | `[]` | Allowed categories. If empty, any value is accepted |
 | `featured` | `string` | — | Slug to pin as the featured post |
 | `strict` | `boolean` | `false` | Treat warnings as errors |
+| `includeDrafts` | `boolean` | `false` | Include posts with `draft: true` in generated output |
 
 CLI flags override config file values. Missing config file is not an error.
 
@@ -165,7 +198,7 @@ All fields below are read from each `.md` file's YAML frontmatter.
 | `date` | `string` | ✓ | Any parseable date string: `2026-03-04` or `Mar 4, 2026` |
 | `readTime` | `string` | ✓ | e.g. `"5 min read"` |
 | `featured` | `boolean` | — | Default `false` |
-| `draft` | `boolean` | — | Default `false` |
+| `draft` | `boolean` | — | Default `false`; validated but excluded from sync output by default |
 | `order` | `number` | — | Manual sort position. Default `0` (sort by date) |
 
 ---
@@ -234,7 +267,7 @@ This is a focused utility. The following are intentionally out of scope:
 ## Programmatic API
 
 ```typescript
-import { sync, validate, loadConfig } from "mdpublish";
+import { sync, validate, loadConfig } from "@ismail-rt/mdpublish";
 
 // Full pipeline
 const result = await sync({
@@ -251,7 +284,7 @@ const report = await validate({ content: "src/content/blog" });
 const config = await loadConfig();
 
 // Types
-import type { BlogPost, ValidationError, Warning, ResolvedConfig, SyncResult } from "mdpublish";
+import type { BlogPost, ValidationError, Warning, ResolvedConfig, SyncResult } from "@ismail-rt/mdpublish";
 ```
 
 ---

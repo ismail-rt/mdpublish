@@ -1,9 +1,6 @@
-import path from "path";
 import { loadConfig as _loadConfig } from "./core/config.js";
-import { scanContentDir } from "./core/scanner.js";
-import { parseAll } from "./core/parser.js";
-import { validateAll, sortPosts } from "./core/validator.js";
-import { emit } from "./core/emitter.js";
+import { runSync } from "./commands/sync.js";
+import { runValidate } from "./commands/validate.js";
 import type {
   BlogPost,
   ValidationError,
@@ -33,48 +30,7 @@ export async function loadConfig(overrides?: ConfigOverrides): Promise<ResolvedC
  */
 export async function sync(overrides?: ConfigOverrides): Promise<SyncResult> {
   const config = _loadConfig(overrides);
-  const contentDir = path.resolve(config.content);
-
-  const scanned = scanContentDir(contentDir);
-
-  if (scanned.length === 0) {
-    return {
-      posts: [],
-      errors: [
-        {
-          type: "parse",
-          file: contentDir,
-          message: `No .md files found in ${contentDir}`,
-        },
-      ],
-      warnings: [],
-      outputPath: path.resolve(config.output),
-    };
-  }
-
-  const { parsed, errors: parseErrors } = parseAll(scanned);
-  const { valid, errors: validationErrors, warnings } = validateAll(parsed, config.categories);
-  const allErrors = [...parseErrors, ...validationErrors];
-
-  if (allErrors.length > 0) {
-    return {
-      posts: [],
-      errors: allErrors,
-      warnings,
-      outputPath: path.resolve(config.output),
-    };
-  }
-
-  const sorted = sortPosts(valid);
-  const outputPath = path.resolve(config.output);
-  emit(sorted, config, contentDir);
-
-  return {
-    posts: sorted,
-    errors: [],
-    warnings,
-    outputPath,
-  };
+  return runSync({ config });
 }
 
 /**
@@ -88,27 +44,5 @@ export async function validate(
   overrides?: ConfigOverrides
 ): Promise<ValidationResult & { parseErrors: ParseError[] }> {
   const config = _loadConfig(overrides);
-  const contentDir = path.resolve(config.content);
-
-  const scanned = scanContentDir(contentDir);
-
-  if (scanned.length === 0) {
-    return {
-      valid: [],
-      errors: [],
-      warnings: [],
-      parseErrors: [
-        {
-          type: "parse",
-          file: contentDir,
-          message: `No .md files found in ${contentDir}`,
-        },
-      ],
-    };
-  }
-
-  const { parsed, errors: parseErrors } = parseAll(scanned);
-  const { valid, errors, warnings } = validateAll(parsed, config.categories);
-
-  return { valid, errors, warnings, parseErrors };
+  return runValidate({ config });
 }

@@ -43,6 +43,7 @@ export interface ResolvedConfig {
   categories: string[];
   featured: string | undefined;
   strict: boolean;
+  includeDrafts: boolean;
 }
 
 export interface SyncResult {

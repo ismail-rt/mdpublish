@@ -13,6 +13,7 @@ function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
     categories: [],
     featured: undefined,
     strict: false,
+    includeDrafts: false,
     ...overrides,
   };
 }

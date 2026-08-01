@@ -7,8 +7,8 @@ export interface ScannedFile {
 }
 
 /**
- * Discovers all .md files in contentDir (non-recursive).
- * Returns them sorted alphabetically by filename.
+ * Recursively discovers all .md files in contentDir.
+ * Returns them sorted alphabetically by relative path.
  * Skips empty files with a console warning rather than throwing.
  */
 export function scanContentDir(contentDir: string): ScannedFile[] {
@@ -21,24 +21,34 @@ export function scanContentDir(contentDir: string): ScannedFile[] {
     throw new Error(`Content path is not a directory: ${contentDir}`);
   }
 
-  const entries = fs.readdirSync(contentDir).sort();
   const results: ScannedFile[] = [];
 
-  for (const entry of entries) {
-    if (!entry.endsWith(".md")) continue;
+  function visit(directory: string): void {
+    const entries = fs.readdirSync(directory, { withFileTypes: true });
 
-    const fullPath = path.join(contentDir, entry);
-    const fileStat = fs.statSync(fullPath);
+    for (const entry of entries) {
+      const fullPath = path.join(directory, entry.name);
 
-    if (!fileStat.isFile()) continue;
+      if (entry.isDirectory()) {
+        visit(fullPath);
+        continue;
+      }
 
-    if (fileStat.size === 0) {
-      console.warn(`[mdpublish] skipping empty file: ${entry}`);
-      continue;
+      if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+
+      const file = path.relative(contentDir, fullPath);
+      const fileStat = fs.statSync(fullPath);
+
+      if (fileStat.size === 0) {
+        console.warn(`[mdpublish] skipping empty file: ${file}`);
+        continue;
+      }
+
+      results.push({ file, fullPath });
     }
-
-    results.push({ file: entry, fullPath });
   }
 
-  return results;
+  visit(contentDir);
+
+  return results.sort((a, b) => a.file.localeCompare(b.file));
 }

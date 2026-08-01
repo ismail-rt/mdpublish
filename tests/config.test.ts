@@ -27,6 +27,7 @@ describe("loadConfig", () => {
     expect(config.format).toBe("ts");
     expect(config.categories).toEqual([]);
     expect(config.strict).toBe(false);
+    expect(config.includeDrafts).toBe(false);
     expect(config.featured).toBeUndefined();
   });
 
@@ -57,9 +58,14 @@ describe("loadConfig", () => {
       "utf-8"
     );
 
-    const config = loadConfig({ content: "override/posts", format: "json" });
+    const config = loadConfig({
+      content: "override/posts",
+      format: "json",
+      includeDrafts: true,
+    });
     expect(config.content).toBe("override/posts");
     expect(config.format).toBe("json");
+    expect(config.includeDrafts).toBe(true);
   });
 
   it("throws when the config file is invalid JSON", () => {

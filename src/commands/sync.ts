@@ -53,8 +53,13 @@ export async function runSync(options: SyncOptions): Promise<SyncResult> {
     };
   }
 
+  // Drafts are validated above, but excluded from published output by default.
+  const publishable = config.includeDrafts
+    ? valid
+    : valid.filter((post) => !post.draft);
+
   // Sort
-  const sorted = sortPosts(valid);
+  const sorted = sortPosts(publishable);
 
   // Emit
   const outputPath = path.resolve(config.output);

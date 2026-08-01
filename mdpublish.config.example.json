@@ -1,5 +1,6 @@
 {
-    "content": "reference/sample-posts",
-    "output": "blog.generated.ts",
-    "format": "ts"
-  }
+  "content": "content",
+  "output": "blog.generated.ts",
+  "format": "ts",
+  "includeDrafts": false
+}

@@ -7,6 +7,7 @@ export const ConfigSchema = z.object({
   categories: z.array(z.string().min(1)).optional().default([]),
   featured: z.string().optional(),
   strict: z.boolean().optional().default(false),
+  includeDrafts: z.boolean().optional().default(false),
 });
 
 export type RawConfig = z.infer<typeof ConfigSchema>;
